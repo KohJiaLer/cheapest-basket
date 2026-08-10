@@ -163,6 +163,59 @@ button {
   min-height: 150px;
 }
 
+.item-form {
+  display: grid;
+  grid-template-columns: 1fr 90px auto;
+  gap: 10px;
+}
+
+.item-form input {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.item-form input:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.item-form button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+}
+
+.item-form button:hover {
+  background: #1d4ed8;
+}
+
+.quantity-input {
+  text-align: center;
+}
+
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
 @media (max-width: 700px) {
   .two-column-grid {
     grid-template-columns: 1fr;
@@ -173,6 +226,14 @@ button {
   }
 
   .input-row button {
+    width: 100%;
+  }
+
+  .item-form {
+    grid-template-columns: 1fr;
+  }
+
+  .item-form button {
     width: 100%;
   }
 }

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { ShopManager } from "./features/shops/ShopManager";
-import type { Shop } from "./types/basket"; 
+import { ItemManager } from "./features/items/ItemManager";
+import type { Shop, BasketItem } from "./types/basket"; 
 
 function App() {
   const [shops, setShops] = useState<Shop[]>([]);
-
+  const [items, setItems] = useState<BasketItem[]>([]);
+  
   function addShop(name: string) {
     const newShop: Shop = {
       id: crypto.randomUUID(),
@@ -20,6 +22,30 @@ function App() {
   function removeShop(shopId: string) {
     setShops((currentShops) =>
       currentShops.filter((shop) => shop.id !== shopId),
+    );
+  }
+
+  function addItem(
+    name: string,
+    quantity: number,
+  ) {
+    const newItem:BasketItem = {
+      id: crypto.randomUUID(),
+      name,
+      quantity,
+    };
+
+    setItems((currentItems) => [
+      ...currentItems,
+      newItem,
+    ]);
+  }
+
+  function removeItem(itemId: string) {
+    setItems((currentItems) =>
+      currentItems.filter(
+        (item) => item.id !== itemId,
+      ),
     );
   }
 
@@ -43,16 +69,11 @@ function App() {
             onRemoveShop={removeShop}
           />
 
-          <section className="card">
-            <h2>Shopping List</h2>
-            <p className="section-description">
-              Add the items you need to buy.
-            </p>
-
-            <p className="empty-message">
-              Shopping-list management will be added later.
-            </p>
-          </section>
+          <ItemManager
+            items={items}
+            onAddItem={addItem}
+            onRemoveItem={removeItem}
+          />
         </div>
 
         <section className="card">
