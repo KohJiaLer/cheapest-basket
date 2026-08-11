@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { ShopManager } from "./features/shops/ShopManager";
 import { ItemManager } from "./features/items/ItemManager";
-import type { Shop, BasketItem } from "./types/basket"; 
+import { PriceTable } from "./features/items/PriceTable";
+import type { Shop, BasketItem, ItemPrice } from "./types/basket"; 
 
 function App() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [items, setItems] = useState<BasketItem[]>([]);
-  
+  const [prices, setPrices] = useState<ItemPrice[]>([]);
+
   function addShop(name: string) {
     const newShop: Shop = {
       id: crypto.randomUUID(),
@@ -17,19 +19,27 @@ function App() {
       ...currentShops,
       newShop,
     ]);
-  };
-
-  function removeShop(shopId: string) {
-    setShops((currentShops) =>
-      currentShops.filter((shop) => shop.id !== shopId),
-    );
   }
+
+function removeShop(shopId: string) {
+  setShops((currentShops) =>
+    currentShops.filter(
+      (shop) => shop.id !== shopId,
+    ),
+  );
+
+  setPrices((currentPrices) =>
+    currentPrices.filter(
+      (price) => price.shopId !== shopId,
+    ),
+  );
+}
 
   function addItem(
     name: string,
     quantity: number,
   ) {
-    const newItem:BasketItem = {
+    const newItem: BasketItem = {
       id: crypto.randomUUID(),
       name,
       quantity,
@@ -47,6 +57,47 @@ function App() {
         (item) => item.id !== itemId,
       ),
     );
+
+    setPrices((currentPrices) =>
+      currentPrices.filter(
+        (price) => price.itemId !== itemId,
+      ),
+    );
+  }
+
+  function updatePrice(
+    shopId: string,
+    itemId: string,
+    unitPrice: number | null,
+  ) {
+    setPrices((currentPrices) => {
+      const existingPrice = currentPrices.find(
+        (price) => 
+          price.shopId === shopId &&
+          price.itemId === itemId,
+      );
+
+      if (existingPrice) {
+        return currentPrices.map((price) =>
+          price.shopId === shopId &&
+          price.itemId === itemId
+            ? {
+              ...price,
+              unitPrice,
+              } 
+            : price,
+        );
+      }
+
+      return [
+        ...currentPrices,
+        {
+          shopId,
+          itemId,
+          unitPrice,
+        }
+      ];
+    });
   }
 
   return (
@@ -76,16 +127,12 @@ function App() {
           />
         </div>
 
-        <section className="card">
-          <h2>Price Comparison</h2>
-          <p className="section-description">
-            Enter the price of each item at each shop.
-          </p>
-
-          <p className="empty-message">
-            Add shops and shopping items to begin comparing prices.
-          </p>
-        </section>
+        <PriceTable
+          shops={shops}
+          items={items}
+          prices={prices}
+          onUpdatePrice={updatePrice}
+        />
 
         <section className="card">
           <h2>Extra Trip Cost</h2>

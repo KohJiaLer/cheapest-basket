@@ -216,6 +216,42 @@ button {
   border-radius: 8px;
 }
 
+.price-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.price-table th,
+.price-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.price-table th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.price-input {
+  width: 100%;
+  min-width: 90px;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+}
+
+.price-input:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
 @media (max-width: 700px) {
   .two-column-grid {
     grid-template-columns: 1fr;
