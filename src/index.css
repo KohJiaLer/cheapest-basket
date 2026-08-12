@@ -252,6 +252,34 @@ button {
   outline-offset: 1px;
 }
 
+.trip-cost-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 260px;
+}
+
+.trip-cost-field label {
+  font-weight: 600;
+}
+
+.trip-cost-field input {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.trip-cost-field input:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.helper-text {
+  margin: 10px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
 @media (max-width: 700px) {
   .two-column-grid {
     grid-template-columns: 1fr;

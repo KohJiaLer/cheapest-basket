@@ -8,6 +8,7 @@ function App() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [items, setItems] = useState<BasketItem[]>([]);
   const [prices, setPrices] = useState<ItemPrice[]>([]);
+  const [extraTripCost, setExtraTripCost] = useState("0");
 
   function addShop(name: string) {
     const newShop: Shop = {
@@ -136,12 +137,42 @@ function removeShop(shopId: string) {
 
         <section className="card">
           <h2>Extra Trip Cost</h2>
+
           <p className="section-description">
             Estimate the additional cost of visiting a second shop.
           </p>
 
-          <p className="empty-message">
-            Trip-cost settings will be added later.
+          <div className="trip-cost-field">
+            <label htmlFor="extra-trip-cost">
+              Additional trip cost (RM)
+            </label>
+
+            <input
+              id="extra-trip-cost"
+              type="number"
+              min="0"
+              step="0.01"
+              value={extraTripCost}
+              onChange={(event) => {
+                const value = event.target.value;
+
+                if (value === "") {
+                  setExtraTripCost("");
+                  return;
+                }
+
+                const parsedCost = Number(value);
+
+                if (parsedCost >= 0) {
+                  setExtraTripCost(value);           
+                }
+              }}
+            />
+          </div>
+
+          <p className="helper-text">
+            This can represent fuel, parking, public transport,
+            or the value you place on the extra journey.
           </p>
         </section>
 
