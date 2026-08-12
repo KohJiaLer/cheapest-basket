@@ -69,7 +69,7 @@ function removeShop(shopId: string) {
   function updatePrice(
     shopId: string,
     itemId: string,
-    unitPrice: number | null,
+    unitPrice: string | null,
   ) {
     setPrices((currentPrices) => {
       const existingPrice = currentPrices.find(
@@ -149,22 +149,14 @@ function removeShop(shopId: string) {
 
             <input
               id="extra-trip-cost"
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
               value={extraTripCost}
               onChange={(event) => {
                 const value = event.target.value;
 
-                if (value === "") {
-                  setExtraTripCost("");
-                  return;
-                }
-
-                const parsedCost = Number(value);
-
-                if (parsedCost >= 0) {
-                  setExtraTripCost(value);           
+              if (/^(?:\d+\.?\d{0,2})?$/.test(value)) {
+                setExtraTripCost(value);
                 }
               }}
             />

@@ -14,7 +14,7 @@ export function ItemManager({
     onRemoveItem,
 }: ItemManagerProps) {
     const [itemName, setItemName] = useState("");
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState("1");
     const [error, setError] = useState("");
 
     function handleSubmit(
@@ -29,8 +29,14 @@ export function ItemManager({
             return;
         }
 
-        if (quantity < 1) {
-            setError("Quantity must be at least 1.")
+        const parsedQuantity = Number(quantity);
+
+        if (
+            quantity === "" ||
+            !Number.isInteger(parsedQuantity) ||
+            parsedQuantity < 1 
+        ) {
+            setError("Quantity must be a whole number of at least 1.");
             return;
         }
 
@@ -45,10 +51,10 @@ export function ItemManager({
             return;
         }
 
-        onAddItem(trimmedName, quantity);
+        onAddItem(trimmedName, parsedQuantity);
 
         setItemName("");
-        setQuantity(1);
+        setQuantity("1");
         setError("");
     }
 
@@ -72,12 +78,15 @@ export function ItemManager({
 
         <input
             className="quantity-input"
-            type="number"
+            type="text"
             min="1"
             value={quantity}
-            onChange={(event) =>
-            setQuantity(Number(event.target.value))
-            }
+            onChange={(event) => {
+                const value = event.target.value;
+                if (/^\d*$/.test(value)) {
+                    setQuantity(value);
+                }
+            }}
         />
 
         <button type="submit">

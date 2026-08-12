@@ -12,5 +12,5 @@ export type BasketItem = {
 export type ItemPrice = {
     shopId: string;
     itemId: string;
-    unitPrice: number | null;
+    unitPrice: string | null;
 };

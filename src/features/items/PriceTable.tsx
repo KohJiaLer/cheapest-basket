@@ -11,7 +11,7 @@ type PriceTableProps = {
     onUpdatePrice: (
         shopId: string,
         itemId: string,
-        unitPrice: number | null,
+        unitPrice: string | null,
     ) => void;
 };
 
@@ -87,17 +87,19 @@ export function PriceTable({
                                         <td key={shop.id}>
                                             <input
                                                 className="price-input"
-                                                type="number"
-                                                min="0"
-                                                step="0.01"
+                                                type="text"
+                                                inputMode="decimal"
                                                 placeholder="RM"
                                                 value={
                                                     price?.unitPrice ?? ""
                                                 }
                                                 onChange={(event) => {
-                                                    const value =
-                                                        event.target.value;
+                                                    const value = event.target.value;
                                                     
+                                                    if (!/^(?:\d+\.?\d{0,2})?$/.test(value)) {
+                                                        return;
+                                                    }
+
                                                     if (value === "") {
                                                         onUpdatePrice(
                                                             shop.id,
@@ -107,18 +109,12 @@ export function PriceTable({
                                                         return;
                                                     }
 
-                                                    const parsedPrice =
-                                                        Number(value);
-
-                                                    if (parsedPrice >= 0) {
-                                                        const roundedPrice = Math.round(parsedPrice * 100) / 100;
-
-                                                        onUpdatePrice(
-                                                            shop.id,
-                                                            item.id,
-                                                            roundedPrice,
-                                                        );
-                                                    }
+                                                    onUpdatePrice(
+                                                        shop.id,
+                                                        item.id,
+                                                        value,
+                                                    );
+                                    
                                                 }}
                                             />
                                         </td>
