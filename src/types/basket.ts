@@ -14,3 +14,21 @@ export type ItemPrice = {
     itemId: string;
     unitPrice: string | null;
 };
+
+export type ShopAssignment = {
+    shopId: string;
+    itemId: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+};
+
+export type BasketOption = {
+    shopIds: string[];
+    assignments: ShopAssignment[];
+    itemSubTotal: number;
+    extraTripCost: number;
+    finalTotal: number;
+    valid: boolean;
+    invalidReason?: string;
+};
