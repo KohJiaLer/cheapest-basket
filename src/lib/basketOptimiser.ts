@@ -114,3 +114,197 @@ export function findBestSingleShop(
                 : bestOption,
     ); 
 }
+
+export function generateShopPairs(
+    shops: Shop[],
+): [Shop, Shop][] {
+    const pairs: [Shop, Shop][] = [];
+
+    for (
+        let firstIndex = 0;
+        firstIndex < shops.length;
+        firstIndex += 1
+    ) {
+        for (
+            let secondIndex = firstIndex + 1;
+            secondIndex < shops.length;
+            secondIndex += 1
+        ) {
+            pairs.push([
+                shops[firstIndex],
+                shops[secondIndex],
+            ]);
+        }
+    }
+
+    return pairs;
+}
+
+export function calculateTwoShopOption(
+    firstShop: Shop,
+    secondShop: Shop,
+    items: BasketItem[],
+    prices: ItemPrice[],
+    extraTripCost: number,
+): BasketOption {
+    const assignments: ShopAssignment[] = [];
+    const usedShopIds = new Set<string>();
+
+    for (const item of items) {
+        const firstPrice = findUnitPrice(
+            prices,
+            firstShop.id,
+            item.id,
+        );
+
+        const secondPrice = findUnitPrice(
+            prices,
+            secondShop.id,
+            item.id,
+        );
+
+        if (
+            firstPrice === null &&
+            secondPrice === null
+        ) {
+            return {
+                shopIds: [
+                    firstShop.id, 
+                    secondShop.id
+                ],
+                assignments: [],
+                itemSubTotal: 0,
+                extraTripCost: extraTripCost,
+                finalTotal: 0,
+                valid: false,
+                invalidReason: 
+                    `${item.name} does not have a price at either shop.`,
+
+            };
+        }
+
+        let selectedShop: Shop;
+        let selectedPrice: number;
+
+        if (firstPrice === null) {
+            selectedShop = secondShop;
+            selectedPrice = secondPrice!;
+        } else if (secondPrice === null) {
+            selectedShop = firstShop;
+            selectedPrice = firstPrice;
+        } else if (firstPrice <= secondPrice) {
+            selectedShop = firstShop;
+            selectedPrice = firstPrice;
+        } else {
+            selectedShop = secondShop;
+            selectedPrice = secondPrice;
+        }
+
+        const totalPrice = selectedPrice * item.quantity;
+
+        assignments.push({
+            shopId: selectedShop.id,
+            itemId: item.id,
+            quantity: item.quantity,
+            unitPrice: selectedPrice,
+            totalPrice,
+        });
+
+        usedShopIds.add(selectedShop.id);
+    }
+
+    const itemSubTotal = assignments.reduce(
+        (total, assignment) =>
+            total + assignment.totalPrice,
+        0,
+    );
+
+    const appliedTripCost =
+        usedShopIds.size > 1
+            ? extraTripCost
+            : 0;
+
+    return {
+        shopIds: Array.from(usedShopIds),
+        assignments,
+        itemSubTotal,
+        extraTripCost: appliedTripCost,
+        finalTotal:
+            itemSubTotal + appliedTripCost,
+        valid: true,
+    };
+}
+
+export function findBestTwoShopOption(
+    shops: Shop[],
+    items: BasketItem[],
+    prices: ItemPrice[],
+    extraTripCost: number,
+): BasketOption | null {
+    const pairs = generateShopPairs(shops);
+
+    const validOptions = pairs
+        .map(([firstShop, secondShop]) =>
+        calculateTwoShopOption(
+            firstShop,
+            secondShop,
+            items,
+            prices,
+            extraTripCost,
+        ),
+    )
+    .filter((option) => option.valid);
+
+    if (validOptions.length === 0) {
+        return null;
+    }
+
+    return validOptions.reduce(
+        (bestOption, currentOption) =>
+        currentOption.finalTotal <
+        bestOption.finalTotal
+            ? currentOption
+            : bestOption,
+    );
+}
+
+export function findBestBasketOption(
+    shops: Shop[],
+    items: BasketItem[],
+    prices: ItemPrice[],
+    extraTripCost: number,
+): BasketOption | null {
+    const bestSingleShop = findBestSingleShop(
+        shops,
+        items,
+        prices,
+    );
+
+    const bestTwoShop = findBestTwoShopOption(
+        shops,
+        items,
+        prices,
+        extraTripCost,
+    );
+
+    if (!bestSingleShop && !bestTwoShop) {
+        return null;
+    }
+
+    if (!bestSingleShop) {
+        return bestTwoShop;
+    }
+
+    if (!bestTwoShop) {
+        return bestSingleShop;
+    }
+
+    if (
+        bestTwoShop.finalTotal <
+        bestSingleShop.finalTotal
+    ) {
+        return bestTwoShop;
+    }
+
+    return bestSingleShop;
+}
