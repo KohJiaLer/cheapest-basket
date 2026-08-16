@@ -301,3 +301,69 @@ button {
     width: 100%;
   }
 }
+
+.recommendation-result {
+  margin-top: 20px;
+}
+
+.recommendation-shops {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.recommendation-shop {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.recommendation-shop h4 {
+  margin: 0 0 12px;
+}
+
+.recommendation-shop ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recommendation-shop li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.recommendation-shop li:last-child {
+  border-bottom: none;
+}
+
+.recommendation-summary {
+  margin-top: 20px;
+}
+
+.recommendation-summary p {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0;
+}
+
+.recommendation-total {
+  padding-top: 12px;
+  border-top: 1px solid #d1d5db;
+  font-size: 18px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.helper-text {
+  margin: 10px 0 14px;
+  color: #6b7280;
+  font-size: 14px;
+}

@@ -1,14 +1,101 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShopManager } from "./features/shops/ShopManager";
 import { ItemManager } from "./features/items/ItemManager";
 import { PriceTable } from "./features/items/PriceTable";
-import type { Shop, BasketItem, ItemPrice } from "./types/basket"; 
+import type { Shop, BasketItem, ItemPrice, BasketOption } from "./types/basket"; 
+import { findBestBasketOption } from "./lib/basketOptimiser";
+import RecommendationPanel from "./features/recommendation/RecommendationPanel";
 
 function App() {
-  const [shops, setShops] = useState<Shop[]>([]);
-  const [items, setItems] = useState<BasketItem[]>([]);
-  const [prices, setPrices] = useState<ItemPrice[]>([]);
-  const [extraTripCost, setExtraTripCost] = useState("0");
+  function loadStoredValue<T>(
+    key: string,
+    fallback: T,
+  ): T {
+    const storedValue = localStorage.getItem(key);
+
+    if (!storedValue) {
+      return fallback;
+    }
+
+    try {
+      return JSON.parse(storedValue) as T;
+    } catch {
+      return fallback;
+    }
+  }
+
+  const [shops, setShops] = useState<Shop[]>(() =>
+    loadStoredValue("cheapest-basket-shops", []),
+  );
+
+  const [items, setItems] = useState<BasketItem[]>(() =>
+    loadStoredValue("cheapest-basket-items", []),
+  );
+
+  const [prices, setPrices] = useState<ItemPrice[]>(() =>
+    loadStoredValue("cheapest-basket-prices", []),
+  );
+
+  const [extraTripCost, setExtraTripCost] =
+    useState<string>(() =>
+      loadStoredValue(
+        "cheapest-basket-trip-cost",
+        "0",
+      ),
+    );
+  const [recommendation, setRecommendation] = useState<BasketOption | null>(null);
+  const [hasCalculated, setHasCalculated] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "cheapest-basket-shops",
+      JSON.stringify(shops),
+    );
+  }, [shops]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "cheapest-basket-items",
+      JSON.stringify(items),
+    );
+  }, [items]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "cheapest-basket-prices",
+      JSON.stringify(prices),
+    );
+  }, [prices]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "cheapest-basket-trip-cost",
+      JSON.stringify(extraTripCost),
+    );
+  }, [extraTripCost]);
+
+  function clearRecommendation() {
+    setRecommendation(null);
+    setHasCalculated(false);
+  }
+  
+  function hasIncompletePrices() {
+    return items.some((item) =>
+      shops.some((shop) => {
+        const price = prices.find(
+          (price) =>
+            price.shopId === shop.id &&
+            price.itemId === item.id,
+        );
+
+        return (
+          !price ||
+          price.unitPrice === null ||
+          price.unitPrice === ""
+        );
+      }),
+    );
+  }
 
   function addShop(name: string) {
     const newShop: Shop = {
@@ -20,21 +107,25 @@ function App() {
       ...currentShops,
       newShop,
     ]);
+
+    clearRecommendation();
   }
 
-function removeShop(shopId: string) {
-  setShops((currentShops) =>
-    currentShops.filter(
-      (shop) => shop.id !== shopId,
-    ),
-  );
+  function removeShop(shopId: string) {
+    setShops((currentShops) =>
+      currentShops.filter(
+        (shop) => shop.id !== shopId,
+      ),
+    );
 
-  setPrices((currentPrices) =>
-    currentPrices.filter(
-      (price) => price.shopId !== shopId,
-    ),
-  );
-}
+    setPrices((currentPrices) =>
+      currentPrices.filter(
+        (price) => price.shopId !== shopId,
+      ),
+    );
+
+    clearRecommendation();
+  }
 
   function addItem(
     name: string,
@@ -50,6 +141,8 @@ function removeShop(shopId: string) {
       ...currentItems,
       newItem,
     ]);
+
+    clearRecommendation();
   }
 
   function removeItem(itemId: string) {
@@ -64,6 +157,8 @@ function removeShop(shopId: string) {
         (price) => price.itemId !== itemId,
       ),
     );
+
+    clearRecommendation();
   }
 
   function updatePrice(
@@ -99,6 +194,25 @@ function removeShop(shopId: string) {
         }
       ];
     });
+
+    clearRecommendation();
+  }
+
+  function handleFindCheapestBasket() {
+    const numericTripCost =
+      extraTripCost === ""
+        ? 0
+        : Number(extraTripCost);
+
+    const result = findBestBasketOption(
+      shops,
+      items,
+      prices,
+      numericTripCost,
+    );
+
+    setRecommendation(result);
+    setHasCalculated(true)
   }
 
   return (
@@ -157,6 +271,7 @@ function removeShop(shopId: string) {
 
               if (/^(?:\d+\.?\d{0,2})?$/.test(value)) {
                 setExtraTripCost(value);
+                clearRecommendation();
                 }
               }}
             />
@@ -171,9 +286,33 @@ function removeShop(shopId: string) {
         <section className="card result-placeholder">
           <h2>Recommendation</h2>
 
-          <p className="empty-message">
-            Your cheapest basket recommendation will appear here.
+          <p className="section-description">
+            Find the cheapest way to buy your complete basket.
           </p>
+
+          {hasIncompletePrices() && (
+            <p className="helper-text">
+              Blank prices are treated as unavailable at that shop.
+            </p>
+          )}
+          
+          <button
+            type="button"
+            onClick={handleFindCheapestBasket}
+            disabled={
+              shops.length === 0 ||
+              items.length === 0
+            }
+          >
+            Find Cheapest Basket
+          </button>
+
+          <RecommendationPanel
+            recommendation={recommendation}
+            shops={shops}
+            items={items}
+            hasCalculated={hasCalculated}
+          />
         </section>
       </main>
     </div>
