@@ -1,3 +1,7 @@
+## Live Demo
+
+Deployed application: https://cheapest-basket-5q77ous5g-kohjialers-projects.vercel.app/
+
 # Cheapest Basket
 
 Cheapest Basket is a React and TypeScript web application that helps users determine the lowest-cost way to purchase a shopping basket from either one shop or a combination of two shops.
