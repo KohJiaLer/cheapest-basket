@@ -7,7 +7,7 @@ Buying each item from the shop with the lowest price may reduce the
 basket cost, but visiting a second shop also has an additional cost
 such as fuel, parking, public transport, or time.
 
-The goal is to compare single-shop and multi (two)-shop shopping options
+The goal is to compare single-shop and two-shop shopping options
 and recommend the option with the lowest adjusted cost.
 
 ## Target User
@@ -24,7 +24,7 @@ shops to determine whether visiting a second shop is actually worth it.
 - Shopping items
 - Item quantities
 - Item prices at each shop
-- Item availability
+- Blank prices are treated as unavailable
 - Additional cost of visiting a second shop
 
 ## Outputs

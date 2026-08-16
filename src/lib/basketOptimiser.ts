@@ -125,6 +125,8 @@ export function generateShopPairs(
         firstIndex < shops.length;
         firstIndex += 1
     ) {
+        // Start after the first shop to avoid duplicate pairs
+        // such as A+B and B+A, and to avoid pairing a shop with itself.
         for (
             let secondIndex = firstIndex + 1;
             secondIndex < shops.length;
@@ -163,6 +165,8 @@ export function calculateTwoShopOption(
             item.id,
         );
 
+        // A two-shop option is invalid if neither shop
+        // can supply one of the required basket items.
         if (
             firstPrice === null &&
             secondPrice === null
@@ -219,6 +223,8 @@ export function calculateTwoShopOption(
         0,
     );
 
+    // Only charge the extra trip cost when the final
+    // basket actually requires purchases from both shops.
     const appliedTripCost =
         usedShopIds.size > 1
             ? extraTripCost
@@ -298,7 +304,9 @@ export function findBestBasketOption(
     if (!bestTwoShop) {
         return bestSingleShop;
     }
-
+    
+    // Use a strict comparison so a single-shop option
+    // wins when both options have the same final cost.
     if (
         bestTwoShop.finalTotal <
         bestSingleShop.finalTotal

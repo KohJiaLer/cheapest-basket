@@ -7,6 +7,8 @@ import { findBestBasketOption } from "./lib/basketOptimiser";
 import RecommendationPanel from "./features/recommendation/RecommendationPanel";
 
 function App() {
+  // Fall back to the default value if stored data is
+  // missing or cannot be parsed.
   function loadStoredValue<T>(
     key: string,
     fallback: T,
@@ -36,6 +38,8 @@ function App() {
     loadStoredValue("cheapest-basket-prices", []),
   );
 
+  // Keep currency input as text while editing so values
+  // such as "5." and "5.50" can be entered naturally.
   const [extraTripCost, setExtraTripCost] =
     useState<string>(() =>
       loadStoredValue(
@@ -74,6 +78,8 @@ function App() {
     );
   }, [extraTripCost]);
 
+  // Clear derived results whenever their source data changes
+  // so an outdated recommendation is never displayed.
   function clearRecommendation() {
     setRecommendation(null);
     setHasCalculated(false);
@@ -295,7 +301,7 @@ function App() {
               Blank prices are treated as unavailable at that shop.
             </p>
           )}
-          
+
           <button
             type="button"
             onClick={handleFindCheapestBasket}
